@@ -42,7 +42,7 @@ def forward(X, W, b):
 ### Interpretation of Output
 
 We can interpret the output as the probability that y belongs to class 1.
-p(y = 1 | x) = σ(wTx) ∈ (0, 1)
+* p(y = 1 | x) = σ(wTx) ∈ (0, 1)
 
 It should be fairly intuitive that if we round this output, we will predict the class.
 (Ex. an output of .6 is a 60% probability of class 1, so we should round .6 to 1)
@@ -54,8 +54,8 @@ Predict round(p(y = 1) | x)
 
 It's also intuitive that our model is similar to linear regression.
 
-Logistic: y = σ(wTx)
-Linear: y = wTx
+* Logistic: y = σ(wTx)
+* Linear: y = wTx
 
 In very simple scenarios, we can interpret the weights similarly, but once the models
 become more complicated (i.e. neural networks) this is no longer the case.
@@ -68,16 +68,16 @@ To be completed
 
 ### Cross Entropy Error Function - Theory
 
-J = -{ tlog(y) + (1-t)log(1-y) }
-t = target
-y = output of logistic regression
+* J = -{ tlog(y) + (1-t)log(1-y) }
+* t = target
+* y = output of logistic regression
 
 Note that if t = 1, only the first term matters. Whereas if t = 0, only the second term
 matters.
 
 We want to do this for all of our data simultaneously
 
-J = -Σ tlog(y) + (1-t)log(1-y)
+* J = -Σ tlog(y) + (1-t)log(1-y)
 
 In code (Inefficient version)
 ```
@@ -103,9 +103,9 @@ def cross_entropy(Y, P):
 
 ### Maximizing the likelihood
 
-P(y = 1 | x) = σ(wTx)
-Likeilhood = π y^t(1 - y)^(1-t)
-log(Likelihood) = Σ tlog(y) + (1-t)log(1-y)
+* P(y = 1 | x) = σ(wTx)
+* Likeilhood = π y^t(1 - y)^(1-t)
+* log(Likelihood) = Σ tlog(y) + (1-t)log(1-y)
 
 Since the log(Likelihood) is the opposite of the Cross Entropy Error, Maximizing the
 likelihood is the same as minimizing the cross entropy error.
@@ -118,9 +118,9 @@ This is more difficult than linear regression, as it requires us to split the er
 into three partial derivatives.
 
 Our result is:
-∂J/∂w = Σ (y - t)x
-Since aTb = Σab, we can rewrite this as:
-∂J/∂w = XT(Y - T)
+* ∂J/∂w = Σ (y - t)x
+* Since aTb = Σab, we can rewrite this as:
+* ∂J/∂w = XT(Y - T)
 
 Note that the bias is when all x values are 1, so we can write this as Σ (y - t)
 

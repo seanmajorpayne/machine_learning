@@ -140,7 +140,72 @@ for i in range(100):
 
 ## Practical Concerns
 
-To Complete
+Issues that occur with Logistic Regression include overfitting (model works well 
+on training data but not on test data).
+
+Our error function is also a linear function, so other data that can be seperated (XOR, Donuts)
+will not work natively with our error function.
+
+We can also run into issues if our demensionality is greater than our number of samples.
+
+### L2 Regularization
+
+What happens if our best weights never converge? I.E. the model improves no matter how
+big or small the weights get.
+
+If our best weights approach infinity, we will get an error trying to compute them, so we
+need a way to limit the weights to a useful range.
+
+Regularization can help us penalize large weights. L2 Regularization does this by making
+all of our weights close to 0, but not exactly 0.
+
+Our new error function becomes:
+
+* Jridge = J + (λ/2)||w||^2 = J + (λ/2)wTw
+* λ will usually be ~.1, 1 but depends on the data
+
+Note that we still want to do gradient descent
+
+* ∂Jreg/∂w = xT(Y - T) + λw
+
+Probabalistic Perspective
+* J = [tlogy + (1-t)log(1-y)] - (λ/2)||w||^2
+* exp(J) = y^t(1-y)^(1-t) * exp(-λ||w||^2 / 2)
+
+In Code:
+```
+w += learning_rate * (np.dot((T - Y).T, Xb) - 0.1*w)
+```
+
+### L1 Regularization
+
+If our D >> N then we may have noise influencing our output. In this situation, we want
+to reduce the number of features that impact our results. We do this by making most
+of our weights 0 and a few important weights non-zero.
+
+* Jlasso = -[tlogy + (1-t)log(1-y)] + (λ/2)||w||
+* ∂Jlasso/∂w = xT(y - t) + λsign(w)
+
+In Code:
+```
+learning_rate = 0.001
+l1 = 2.0
+for t in range(5000):
+	Yhat = sigmoid(X.dot(w))
+	delta = Yhat - Y
+	w = w - learning_rate*(X.T.dot(delta) + l1*np.sign(w))
+	cost = -(Y*np.log(Yhat) + (1-Y)*np.log(1 - Yhat)).mean() + l1*np.abs(w).mean()
+```
+
+### ElasticNet
+
+It is possible to include both L1 and L2 regularization to a model.
+
+* Jen = J + λ|w| + λ|w|^2
+
+
+
+
 
 
 

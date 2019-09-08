@@ -138,6 +138,10 @@ for i in range(100):
 	b -= learning_rate * (pYtrain - Ytrain).sum()
 ```
 
+## Practical Concerns
+
+To Complete
+
 
 
 

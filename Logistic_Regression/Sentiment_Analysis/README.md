@@ -31,7 +31,7 @@ last value represents 0 (negative) or 1 (positive)
 
 Example:
 ```
-	w1,w2,w3     p/n
+    w1,w2,w3     p/n
 r1 [ 2, 3, 1,  ...0]
 r2 [ 1, 0, 5, ....1]
 ```

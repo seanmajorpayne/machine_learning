@@ -1,1 +1,5 @@
-.DS_Store
+*.DS_Store
+/RedditImageScraper/Pipfile
+/RedditImageScraper/Pipfile.lock
+/RedditImageScraper/__pycache__
+/RedditImageScraper/new_file.csv

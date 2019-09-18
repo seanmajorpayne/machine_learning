@@ -13,6 +13,12 @@ the site. Please respect Reddit's guidelines and do not change this value.
 In the current state, the program will only pull from the top posts of all time, but this
 will be changed soon.
 
+## File Descriptions
+1. RIS.py - Scrapes website for images & saves them to CSV
+2. util.py - Series of helper methods
+3. plot_images.py - A test program to see the downloaded images
+
+
 ### Downloaded Data format
 
 File Type: CSV

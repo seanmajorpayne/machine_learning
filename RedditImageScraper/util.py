@@ -69,7 +69,3 @@ def url_builder(post_id, subreddit):
 			'&after=' + post_id + '&dist=5&layout=card&sort=top&t=all')			
 			
 	return url
-
-X = get_data()
-for im in X:
-	plot_image(im)

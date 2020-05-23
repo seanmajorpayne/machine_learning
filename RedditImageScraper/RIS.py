@@ -41,6 +41,7 @@ def extract_upvotes(json):
 # last post which will be used for future JSON requests.
 def json_to_first_posts(json):
 	post_container = json['data']['children']
+	print(post_container)
 	posts = [p for p in post_container
 				if len(p['data']['name']) <= 9					# Remove Ads,
 				and p['data']['post_hint'] == 'image']			# and non-image posts	
@@ -72,8 +73,9 @@ def get_posts(json, first):
 	return posts, reload_id
 
 # Adds image data into a Numpy array and returns it.
-def process_images(j, first):
-	posts, reload_id = get_posts(j, first)
+# Takes in Json data and a boolean of whether or not this is the first iteration
+def process_images(json, first):
+	posts, reload_id = get_posts(json, first)
 	X = np.zeros((len(posts), 96*96+1))
 	for i, p in enumerate(posts):
 		score, url = get_data(p, first)

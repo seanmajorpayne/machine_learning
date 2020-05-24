@@ -58,7 +58,8 @@ class JsonParserFirst(JsonParser):
 		
 		posts = [p for p in post_container
 			if len(p['data']['name']) <= 9					# Remove Ads,
-			and p['data']['post_hint'] == 'image']			# and non-image posts
+			and 'redd.it' in p['data']['url']
+			and '.jpg' in p['data']['url']]			# and non-image posts
 		
 		return posts
 	

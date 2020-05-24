@@ -7,9 +7,9 @@
 
 import json
 import numpy as np
-from util import save_csv, url_builder, request_site, get_image, get_start_url, plot_image
+from app.util import save_csv, url_builder, request_site, get_image, get_start_url, plot_image
 from time import sleep
-from JsonParse import JsonParserFirst, JsonParser
+from app.JsonParse import JsonParserFirst, JsonParser
 
 id_dict = {}
 
@@ -40,6 +40,18 @@ def postsToNumpy(parser, posts):
 	
 	return X, reload_id
 
+def getParser(json_response):
+	"""Reddit uses two distinct JSON structures.
+	One structure is ['data']['children']
+	The other structure is ['posts']
+	This method returns the correct class to parse the structures.
+	"""
+	
+	if 'data' in json_response:
+		return JsonParserFirst(json_response)
+	else:
+		return JsonParser(json_response, id_dict)
+
 
 def getJson(url):
 	"""Checks if a specified URL is available
@@ -49,22 +61,15 @@ def getJson(url):
 	if r.status_code != 200:
 		raise Exception("Unable to connect to Website, Response is not 200")
 	return r.json()
-	
 
-def main():
-	url, subreddit = get_start_url()
+
+def scrapeSite(subreddit, category, timeframe):
+	url = get_start_url(subreddit, category, timeframe)
 	for i in range(2):
 	
 		json_response = getJson(url)
 		
-		"""The initial page load JSON will be different
-		than the subsequent loads, so separate classes are used
-		to parse the different structures.
-		"""
-		if (i == 0):
-			parser = JsonParserFirst(json_response)
-		else:
-			parser = JsonParser(json_response, id_dict)
+		parser = getParser(json_response)
 		
 		posts = parser.getPosts()
 		matrix_of_posts, reload_id = postsToNumpy(parser, posts)
@@ -73,5 +78,5 @@ def main():
 		url = url_builder(reload_id, subreddit)	
 	
 	
-if __name__ == '__main__':
-	main()
+#if __name__ == '__main__':
+#	main()

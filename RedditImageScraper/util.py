@@ -12,10 +12,9 @@ import matplotlib.pyplot as plt
 x, y = 96, 96
 
 # Grab the initial URL from the user (Parameters to be added)
-def get_start_url():
-	subreddit = input("Enter subreddit name (ex. photocritique): ")
-	url = 'https://www.reddit.com/r/' + subreddit + '/top/.json?t=all'	# Top posts of all time
-	return url, subreddit
+def get_start_url(subreddit, category, timeframe):
+	url = 'https://www.reddit.com/r/' + subreddit + '/' + category + '/.json?t=' + timeframe
+	return url
 
 # Reddit requires a specific user agent for scraping programs
 # Please change this value to specify what you're doing.
@@ -43,14 +42,14 @@ def get_image(url):
 
 # Reads in data from a CSV file and grabs the image portion of the data.
 def get_data():
-	df = pd.read_csv('new_file.csv', header=None)
+	df = pd.read_csv('scraped_images.csv', header=None)
 	X = df.to_numpy()
 	X = X[:,1:]
 	return X
 
 # Appends a matrix to a csv file. Creates file if it doesn't exist.
 def save_csv(matrix):
- 	with open("new_file.csv","a+") as my_csv:
+ 	with open("scraped_images.csv","a+") as my_csv:
  		csvWriter = csv.writer(my_csv,delimiter=',')
  		csvWriter.writerows(matrix)
 
@@ -66,6 +65,6 @@ def url_builder(post_id, subreddit):
 			'/v1/subreddits/' + subreddit + '?rtj=only'
 			'&redditWebClient=web2x&app=web2x-client-production'
 			'&allow_over18=&include=identity%2CprefsSubreddit'
-			'&after=' + post_id + '&dist=5&layout=card&sort=top&t=all')			
+			'&after=' + str(post_id) + '&dist=5&layout=card&sort=top&t=all')			
 			
 	return url

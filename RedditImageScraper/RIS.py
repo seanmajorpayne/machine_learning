@@ -7,104 +7,71 @@
 
 import json
 import numpy as np
-from util import save_csv, url_builder, request_site, get_image, get_start_url
+from util import save_csv, url_builder, request_site, get_image, get_start_url, plot_image
 from time import sleep
+from JsonParse import JsonParserFirst, JsonParser
 
 id_dict = {}
 
-# Gets the URL & Score from JSON data.
-def get_data(p, first):
-	if first:
-		score, url = p['data']['ups'], p['data']['url']
-	else:
-		score, url = p['score'], p['media']['content']
-	return score, url
-
-# Extracts the upvote count from the initial JSON.
-def extract_upvotes_first(json):
-	try:
-		return(int(json['data']['score']))
-	except KeyError:
-		print("Failed to Extract Upvotes")
-		return(-1)
-
-# Extracts the upvote count from the infinite scroll JSON.
-# Note that the JSON value locations are different
-def extract_upvotes(json):
-	try:
-		return(int(json['score']))
-	except KeyError:
-		print("Failed to Extract Upvotes")
-		return(-1)
-
-# Extracts post data from the initial JSON. Also gets the id of the
-# last post which will be used for future JSON requests.
-def json_to_first_posts(json):
-	post_container = json['data']['children']
-	print(post_container)
-	posts = [p for p in post_container
-				if len(p['data']['name']) <= 9					# Remove Ads,
-				and p['data']['post_hint'] == 'image']			# and non-image posts	
-	posts.sort(key=extract_upvotes_first, reverse=True)
-	for p in posts:
-		id_dict[p['data']['name']] = p['data']['score']
-	return posts, posts[-1]['data']['name']
-
-# Extracts post data from the infinite scroll JSON. Also gets the id of the
-# last post which will be used for future JSON requests
-def json_to_posts(json):
-	post_container = json['posts']
-	posts = [p for p in post_container.values()
-				if len(p['id']) <= 9					# Remove Ads,
-				and p['media'] != None
-				and p['media']['type'] == 'image'		# and non-image posts
-				and p['id'] not in id_dict]				# no duplicates
-	posts.sort(key=extract_upvotes, reverse=True)
-	for p in posts:
-		id_dict[p['id']] = p['score']
-	return posts, posts[-1]['id']
-
-# Gets the posts & reload_id and returns them
-def get_posts(json, first):
-	if(first):
-		posts, reload_id = json_to_first_posts(json)
-	else:
-		posts, reload_id = json_to_posts(json)
-	return posts, reload_id
-
-# Adds image data into a Numpy array and returns it.
-# Takes in Json data and a boolean of whether or not this is the first iteration
-def process_images(json, first):
-	posts, reload_id = get_posts(json, first)
+def postsToNumpy(parser, posts):
+	"""Takes a list of posts and extracts
+	their scores and pixel values. Returns this
+	information as a matrix.
+	"""
 	X = np.zeros((len(posts), 96*96+1))
+	
+	upvote_minimum = float('inf')
+	
+	reload_id = 0
+	
 	for i, p in enumerate(posts):
-		score, url = get_data(p, first)
+		upvotes = parser.getUpvotes(p)
+		url = parser.getURL(p)
+		id = parser.getId(p)
+		
+		if upvotes < upvote_minimum:
+			upvote_minimum = upvotes
+			reload_id = id
+		
+		id_dict[id] = upvotes	# Prevent duplicates
 		sleep(1)
 		im = get_image(url)
-		X[i,0], X[i,1:] = score, im
-	return X, reload_id	
+		X[i,0], X[i,1:] = upvotes, im
+	
+	return X, reload_id
 
-# Scrapes the specified URL and saves numpy data into a CSV.
-def scrape_site(url, first):
+
+def getJson(url):
+	"""Checks if a specified URL is available
+	and returns the JSON from that URL
+	"""
 	r = request_site(url)
-	if r.status_code == 200:
-		X, reload_id = process_images(r.json(), first)
-		save_csv(X)
-		return reload_id
-	else:
-		print("Error Scraping Website, Could Not Connect")
+	if r.status_code != 200:
+		raise Exception("Unable to connect to Website, Response is not 200")
+	return r.json()
+	
 
-# Scrapes the site for a user specified number of iterations. 
 def main():
 	url, subreddit = get_start_url()
-	print("Starting Scrape Iteration:", 1)
-	reload_id = scrape_site(url, True)
-	url = url_builder(reload_id, subreddit)
-	for i in range(1):
-		print("Starting Scrape Iteration:", i+2)
-		reload_id = scrape_site(url, False)
-		url = url_builder(reload_id, subreddit)
+	for i in range(2):
+	
+		json_response = getJson(url)
 		
-
+		"""The initial page load JSON will be different
+		than the subsequent loads, so separate classes are used
+		to parse the different structures.
+		"""
+		if (i == 0):
+			parser = JsonParserFirst(json_response)
+		else:
+			parser = JsonParser(json_response, id_dict)
+		
+		posts = parser.getPosts()
+		matrix_of_posts, reload_id = postsToNumpy(parser, posts)
+		
+		save_csv(matrix_of_posts)
+		url = url_builder(reload_id, subreddit)	
+	
+	
 if __name__ == '__main__':
 	main()

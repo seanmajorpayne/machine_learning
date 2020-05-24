@@ -8,9 +8,10 @@
 ###########################################
 
 class JsonParser:
-	def __init__(self, json_data):
+	def __init__(self, json_data, id_dict={}):
 		self.json_data = json_data
 		self.post_id_dictionary = {}
+		self.id_dict = id_dict
 	
 	def getPosts(self):
 		"""Grabs reddit 'posts' from Json, removes non-image
@@ -23,15 +24,29 @@ class JsonParser:
 					if len(p['id']) <= 9					# Remove Ads,
 					and p['media'] != None
 					and p['media']['type'] == 'image'		# and non-image posts
-					and p['id'] not in id_dict]				# no duplicates
+					and p['id'] not in self.id_dict]		# no duplicates
 		
 		return posts
+	
+	def getUpvotes(self, json_post):
+		"""Returns the upvote count for a given post"""
+		return json_post['score']
+	
+	def getURL(self, json_post):
+		"""Returns the URL for a given post"""
+		return json_post['media']['content']
+	
+	def getId(self, json_post):
+		"""Returns an ID for a given post"""
+		return json_post['id']
+		
+
 
 class JsonParserFirst(JsonParser):
-	def __init__(self, json_data):
+	def __init__(self, json_data, id_dict={}):
 		super().__init__(self)
 		self.json_data = json_data
-		self.post_id_dictionary = {}
+		self.id_dict = id_dict
 	
 	def getPosts(self):
 		"""
@@ -47,16 +62,16 @@ class JsonParserFirst(JsonParser):
 		
 		return posts
 	
-	def returnIDs(self):
-		return post_id_dictionary
+	def getUpvotes(self, json_post):
+		upvotes = json_post['data']['score']
+		return upvotes
 	
-	def getPostData(self, json_post):
-		
-		post_info = json_post['data']
-		
-		upvotes = post_info['score']
-		title = post_info['title']
-		total_awards_received = post_info['total_awards_received']
-		num_comments = post_info['num_comments']
+	def getURL(self, json_post):
+		url = json_post['data']['url']
+		return url
+	
+	def getId(self, json_post):
+		id = json_post['data']['name']
+		return id
 	
 	

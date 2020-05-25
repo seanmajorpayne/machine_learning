@@ -53,13 +53,12 @@ must be resorted based on the number of upvotes a post received.
 
 ## Checklist & Future Revisions
 - [x] First Draft Uploaded
-- [ ] Get a Code Review
-- [ ] Revisit JSON Request Types & condense if possible
-- [ ] Reformat Upvote Data
-- [ ] Add parameters for narrowing data
-- [ ] Add more data Types
-- [ ] Add User Interface
-- [ ] \(Optional) Host on Web for easy access
+- [x] Revisit JSON Request Types & condense if possible
+- [x] Add parameters for specifying category & timeframe
+- [x] Get test application working in Flask
+- [ ] Add User Interface to Github
+- [ ] Write documentation for how to download/use
+- [ ] Host on Web for demo
 
 
 

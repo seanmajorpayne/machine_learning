@@ -8,6 +8,7 @@ import imageio
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os, sys
 
 x, y = 96, 96
 
@@ -49,9 +50,12 @@ def get_data():
 
 # Appends a matrix to a csv file. Creates file if it doesn't exist.
 def save_csv(matrix):
- 	with open("scraped_images.csv","a+") as my_csv:
+	file_location = os.path.join(sys.path[0], 'app/static/tmp/scraped_images.csv')
+	print(file_location)
+	with open(file_location,"w+") as my_csv:
  		csvWriter = csv.writer(my_csv,delimiter=',')
  		csvWriter.writerows(matrix)
+ 		print("done")
 
 # Plots an image from a given numpy array
 def plot_image(im):

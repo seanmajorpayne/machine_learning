@@ -65,7 +65,7 @@ def getJson(url):
 
 def scrapeSite(subreddit, category, timeframe):
 	url = get_start_url(subreddit, category, timeframe)
-	for i in range(2):
+	for i in range(1):
 	
 		json_response = getJson(url)
 		
@@ -75,7 +75,7 @@ def scrapeSite(subreddit, category, timeframe):
 		matrix_of_posts, reload_id = postsToNumpy(parser, posts)
 		
 		save_csv(matrix_of_posts)
-		url = url_builder(reload_id, subreddit)	
+		url = url_builder(reload_id, subreddit)
 	
 	
 #if __name__ == '__main__':
